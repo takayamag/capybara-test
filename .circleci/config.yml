@@ -10,11 +10,11 @@ jobs:
       - image: circleci/ruby:2.5.1-node-browsers
     steps:
       - checkout
+      - run: printenv
       - run: |
           # TimezoneをAsia/Tokyoへ変更する
           sudo ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime &&
           sudo dpkg-reconfigure -f noninteractive tzdata
-      - run: printenv
       - run: dpkg -l
       - run: apt list | grep installed
       - run: apt list --upgradable
