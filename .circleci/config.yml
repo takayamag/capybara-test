@@ -1,5 +1,5 @@
 # .circleci/config.yml
-# http://docs.knapsackpro.com/2017/circleci-2-0-capybara-feature-specs-selenium-webdriver-with-chrome-headless
+
 version: 2
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
       - run: cat /etc/default/locale
       - run:
           # パッケージを更新する
-          sudo api -qqy upgrade
+          sudo apt -qqy upgrade
       - run: |
           # 全てのlanugage-packをインストールする
           # language-pack-ja単体だと何故か失敗する…
