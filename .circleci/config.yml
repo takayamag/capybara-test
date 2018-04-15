@@ -10,22 +10,23 @@ jobs:
       - image: circleci/ruby:2.5.1-node-browsers
     steps:
       - checkout
-      - run: printenv
+      # - run: printenv
       - run: |
           # TimezoneをAsia/Tokyoへ変更する
           sudo ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime &&
           sudo dpkg-reconfigure -f noninteractive tzdata
-      - run: dpkg -l
-      - run: apt list | grep installed
-      - run: apt list --upgradable
-      - run: apt-cache search language-pack
-      - run: grep '\.UTF-8' /usr/share/i18n/SUPPORTED | awk '{ print $1 }'
-      - run: uname -a
-      - run: locale -a
-      - run: cat /etc/default/locale
+      # - run: dpkg -l
+      # - run: apt list | grep installed
+      # - run: apt list --upgradable
+      # - run: apt-cache search language-pack
+      # - run: grep '\.UTF-8' /usr/share/i18n/SUPPORTED | awk '{ print $1 }'
+      # - run: uname -a
+      # - run: locale -a
+      # - run: cat /etc/default/locale
       - run:
           # パッケージを更新する
           sudo apt -qqy upgrade
+
       - run: |
           # 全てのlanugage-packをインストールする
           # language-pack-ja単体だと何故か失敗する…
@@ -40,9 +41,9 @@ jobs:
           sudo dpkg-reconfigure --frontend noninteractive locales &&
           sudo fc-cache -fv
 
-      - run: locale -a | grep ja_JP
-      - run: apt-cache search language-pack
-      - run: cat /etc/default/locale
+      # - run: locale -a | grep ja_JP
+      # - run: apt-cache search language-pack
+      # - run: cat /etc/default/locale
       - run: |
           # キャッシュなどをクリアする
           sudo apt -qyy autoremove &&
