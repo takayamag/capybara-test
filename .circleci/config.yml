@@ -65,7 +65,7 @@ jobs:
         paths:
           - vendor/bundle
 
-      # Run rspec in parallel
+      # Run rspec
       - type: shell
         command: |
           export BROWSER=chrome; bundle install && bundle exec rspec spec/features/example_spec.rb
