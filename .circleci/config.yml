@@ -30,7 +30,7 @@ jobs:
       - run: |
           # 全てのlanugage-packをインストールする
           # language-pack-ja単体だと何故か失敗する…
-          sudo apt -qqy --no-install-recommends install -y $(check-language-support -l ja) &&
+          sudo apt -qqy --no-install-recommends install -y locales-all &&
           sudo locale-gen ja_JP.UTF-8 &&
           sudo update-locale LANG=ja_JP.UTF-8 &&
           sudo update-locale LANGUAGE="ja_JP:ja"
