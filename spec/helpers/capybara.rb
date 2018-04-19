@@ -23,7 +23,7 @@ Capybara.register_driver :chrome do |app|
   # 参考: https://github.com/SeleniumHQ/selenium/blob/master/rb/spec/unit/selenium/webdriver/chrome/options_spec.rb
 
   # WebDriverのログの出力レベルを変更する
-  # Selenium::WebDriver.logger.level = :debug
+  Selenium::WebDriver.logger.level = :debug
 
   options = Selenium::WebDriver::Chrome::Options.new
 
