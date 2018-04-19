@@ -6,7 +6,7 @@ jobs:
     parallelism: 1
     working_directory: ~/capybara-test
     docker:
-      # this is important to use proper image with browsers support
+      # ChromeやFirefoxがインストールされたRubyのdockerイメージを使用する
       - image: circleci/ruby:2.5.1-node-browsers
     steps:
       - checkout
@@ -30,14 +30,14 @@ jobs:
       - run: |
           # 全てのlanugage-packをインストールする
           # language-pack-ja単体だと何故か失敗する…
-          sudo apt -qqy --no-install-recommends install -y locales-all &&
+          sudo apt -qqy --no-install-recommends install -y $(check-language-support -l ja) &&
           sudo locale-gen ja_JP.UTF-8 &&
           sudo update-locale LANG=ja_JP.UTF-8 &&
           sudo update-locale LANGUAGE="ja_JP:ja"
 
       - run: |
           # 日本語フォントをインストールする
-          sudo apt -qqy --no-install-recommends install -y fonts-ipafont-gothic fonts-ipafont-mincho &&
+          sudo apt -qqy --no-install-recommends install -y fonts-takao-gothic fonts-takao-mincho &&
           sudo dpkg-reconfigure --frontend noninteractive locales &&
           sudo fc-cache -fv
 
@@ -45,29 +45,29 @@ jobs:
       - run: apt-cache search language-pack
       - run: cat /etc/default/locale
       - run: |
-          # キャッシュなどをクリアする
+          # 不要なパッケージやキャッシュを削除する
           sudo apt -qyy autoremove &&
           sudo apt -qyy clean &&
           sudo rm -rf /var/lib/apt/lists/*
 
-      # Restore bundle cache
+      # bundle cacheを復元する
       - type: cache-restore
-        key: project-name-{ { checksum "Gemfile.lock" }}
+        key: dependency-cache-{{ checksum "Gemfile.lock" }}
 
-      # Bundle install dependencies
+      # Bundle installを行う
       - run: bundle install --path vendor/bundle
 
-      # Store bundle cache
+      # bundle cacheを保存する
       - type: cache-save
-        key: project-name-{ { checksum "Gemfile.lock" }}
+        key: dependency-cache-{{ checksum "Gemfile.lock" }}
         paths:
           - vendor/bundle
 
-      # Run rspec
+      # RSpecを実行する
       - type: shell
         command: |
           export BROWSER=chrome; bundle install && bundle exec rspec spec/features/example_spec.rb
 
-      # Save artifacts
+      # Artifactsを保存する
       - type: store_artifacts
         path: ./files/screenshots
