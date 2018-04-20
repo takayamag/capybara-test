@@ -18,4 +18,5 @@ gem 'rspec', '~> 3.7'
 # https://rubygems.org/gems/site_prism
 gem 'site_prism', '~> 2.11'
 
+# https://rubygems.org/gems/chromedriver-helper
 gem 'chromedriver-helper' unless ENV.key?('CIRCLECI')

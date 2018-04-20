@@ -15,13 +15,19 @@ jobs:
           # TimezoneをAsia/Tokyoへ変更する
           sudo ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime &&
           sudo dpkg-reconfigure -f noninteractive tzdata
+      # インストール済みのパッケージ一覧を表示する #1
       - run: dpkg -l
+      # インストール済みのパッケージ一覧を表示する #2
       - run: apt list | grep installed
+      # アップグレード可能なパッケージ一覧を表示する
       - run: apt list --upgradable
-      - run: apt-cache search language-pack
+      # サポートされているロケール一覧を表示する
       - run: grep '\.UTF-8' /usr/share/i18n/SUPPORTED | awk '{ print $1 }'
+      # システム情報を表示する
       - run: uname -a
+      # 現在のロケール設定を確認する
       - run: locale -a
+      # `update-locale`実行前の状態を確認する
       - run: cat /etc/default/locale
       - run:
           # パッケージを更新する
@@ -40,9 +46,9 @@ jobs:
           sudo apt -qqy --no-install-recommends install -y fonts-takao-gothic fonts-takao-mincho &&
           sudo dpkg-reconfigure --frontend noninteractive locales &&
           sudo fc-cache -fv
-
+      # 更新されたロケール設定を確認する
       - run: locale -a | grep ja_JP
-      - run: apt-cache search language-pack
+      # `update-locale`実行後の状態を確認する
       - run: cat /etc/default/locale
       - run: |
           # 不要なパッケージやキャッシュを削除する
