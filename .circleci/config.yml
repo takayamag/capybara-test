@@ -6,27 +6,40 @@ jobs:
     parallelism: 1
     working_directory: ~/capybara-test
     docker:
-      # this is important to use proper image with browsers support
+      # ChromeやFirefoxがインストールされたRubyのdockerイメージを使用する
       - image: circleci/ruby:2.5.1-node-browsers
     steps:
       - checkout
-      # - run: printenv
+
+      - run: printenv
       - run: |
           # TimezoneをAsia/Tokyoへ変更する
           sudo ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime &&
           sudo dpkg-reconfigure -f noninteractive tzdata
-      # - run: dpkg -l
-      # - run: apt list | grep installed
-      # - run: apt list --upgradable
-      # - run: apt-cache search language-pack
-      # - run: grep '\.UTF-8' /usr/share/i18n/SUPPORTED | awk '{ print $1 }'
-      # - run: uname -a
-      # - run: locale -a
-      # - run: cat /etc/default/locale
-      - run:
+      - run: |
+          # インストール済みのパッケージ一覧を表示する #1
+          dpkg -l
+      - run: |
+          # インストール済みのパッケージ一覧を表示する #2
+          apt list | grep installed
+      - run: |
+          # アップグレード可能なパッケージ一覧を表示する
+          apt list --upgradable
+      - run: |
+          # サポートされているロケール一覧を表示する
+          grep '\.UTF-8' /usr/share/i18n/SUPPORTED | awk '{ print $1 }'
+      - run: |
+          # システム情報を表示する
+          uname -a
+      - run: |
+          # 現在のロケール設定を確認する
+          locale -a
+      - run: |
+          # `update-locale`実行前の状態を確認する
+          cat /etc/default/locale
+      - run: |
           # パッケージを更新する
           sudo apt -qqy upgrade
-
       - run: |
           # 全てのlanugage-packをインストールする
           # language-pack-ja単体だと何故か失敗する…
@@ -34,42 +47,41 @@ jobs:
           sudo locale-gen ja_JP.UTF-8 &&
           sudo update-locale LANG=ja_JP.UTF-8 &&
           sudo update-locale LANGUAGE="ja_JP:ja"
-
       - run: |
           # 日本語フォントをインストールする
-          sudo apt -qqy --no-install-recommends install -y fonts-ipafont-gothic fonts-ipafont-mincho &&
+          sudo apt -qqy --no-install-recommends install -y fonts-takao-gothic fonts-takao-mincho &&
           sudo dpkg-reconfigure --frontend noninteractive locales &&
           sudo fc-cache -fv
-
-      # - run: locale -a | grep ja_JP
-      # - run: apt-cache search language-pack
-      # - run: cat /etc/default/locale
       - run: |
-          # キャッシュなどをクリアする
+          # 更新されたロケール設定を確認する
+          locale -a | grep ja_JP
+      - run: |
+          # `update-locale`実行後の状態を確認する
+          cat /etc/default/locale
+      - run: |
+          # 不要なパッケージやキャッシュを削除する
           sudo apt -qyy autoremove &&
           sudo apt -qyy clean &&
           sudo rm -rf /var/lib/apt/lists/*
 
-      # Restore bundle cache
+      # bundle cacheを復元する
       - type: cache-restore
-        # remove space between { {
-        key: project-name-{ { checksum "Gemfile.lock" }}
+        key: dependency-cache-{{ checksum "Gemfile.lock" }}
 
-      # Bundle install dependencies
+      # Bundle installを行う
       - run: bundle install --path vendor/bundle
 
-      # Store bundle cache
+      # bundle cacheを保存する
       - type: cache-save
-        # remove space between { {
-        key: project-name-{ { checksum "Gemfile.lock" }}
+        key: dependency-cache-{{ checksum "Gemfile.lock" }}
         paths:
           - vendor/bundle
 
-      # Run rspec
+      # RSpecを実行する
       - type: shell
         command: |
           export BROWSER=chrome; bundle install && bundle exec rspec spec/features/example_spec.rb
 
-      # Save artifacts
+      # Artifactsを保存する
       - type: store_artifacts
         path: ./files/screenshots
